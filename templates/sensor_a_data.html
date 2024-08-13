@@ -1,0 +1,499 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water Data - Sensor A Height</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+      .card {
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          margin-bottom: 20px;
+      }
+      .card-header {
+          background-color: #f8f9fa;
+          border-bottom: 1px solid #e9ecef;
+          border-radius: 10px 10px 0 0;
+          padding: 15px;
+          font-size: 1.2em;
+      }
+      .card-body {
+          padding: 15px;
+      }
+      .status {
+          font-size: 2em;
+          color: #000000;
+      }
+      .status.safe {
+          color: #28a745;
+      }
+      .status.warning {
+          color: #ffc107;
+      }
+      .status.danger {
+          color: #dc3545;
+      }
+      .chart-container {
+          position: relative;
+          height: 400px;
+          width: 100%;
+      }
+      .info-item {
+          text-align: center;
+          margin-bottom: 10px;
+      }
+      .info-item p {
+          margin: 0;
+      }
+      .info-item .value {
+          font-size: 1.5em;
+          font-weight: bold;
+      }
+      .table-wrapper {
+          max-height: 400px;
+          overflow-y: auto;
+      }
+      
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+{% extends "base.html" %}
+
+{% block content_breadcrumb %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+    <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
+    <li class="breadcrumb-item text-sm text-white active" aria-current="page">Sensor Data Point A</li>
+  </ol>
+  <h6 class="font-weight-bolder text-white mb-0">Sensor Data Point A</h6>
+</nav>
+
+{% endblock %}
+
+{% block content_nav %}
+
+<div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+  <div class="card">
+    <div class="card-body p-3">
+      <div class="row">
+        <div class="col-8">
+          <div class="numbers">
+            <p class="text-sm mb-0 text-uppercase font-weight-bold">Water Height</p>
+            <h5 class="font-weight-bolder" id="latest_water_level_sensor_a">
+              {{ latest_water_level_sensor_a }} m
+            </h5>
+            <p class="mb-0">
+              Status
+              <span id="status_sensor_a" class="text-sm font-weight-bolder">{{ status_sensor_a }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="col-4 text-end">
+          <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+            <i class="ni ni-ruler-pencil text-lg opacity-10" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+  <div class="card">
+    <div class="card-body p-3">
+      <div class="row">
+        <div class="col-8">
+          <div class="numbers">
+            <p class="text-sm mb-0 text-uppercase font-weight-bold">Predicted Height</p>
+            <h5 class="font-weight-bolder" id="latest_predicted_water_level_sensor_a">
+              {{ latest_predicted_water_level_sensor_a }} m
+            </h5>
+            <p class="mb-0">
+              Status
+              <span id="predicted_status_sensor_a" class="text-sm font-weight-bolder">{{ predicted_status_sensor_a }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="col-4 text-end">
+          <div class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
+            <i class="ni ni-sound-wave text-lg opacity-10" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+  <div class="card">
+    <div class="card-body p-3">
+      <div class="row">
+        <div class="col-8">
+          <div class="numbers">
+            <p class="text-sm mb-0 text-uppercase font-weight-bold">Time</p>
+            <h5 class="font-weight-bolder" id="time">
+              {{ time }}
+            </h5>
+            <p class="mb-0">
+                Date
+                <span id="date" class="text text-sm font-weight-bolder">{{ date }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="col-4 text-end">
+          <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
+            <i class="ni ni-calendar-grid-58 text-lg opacity-10" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-xl-3 col-sm-6">
+  <div class="card">
+    <div class="card-body p-3">
+      <div class="row">
+        <div class="col-8">
+          <div class="numbers">
+            <p class="text-sm mb-0 text-uppercase font-weight-bold">Rain & Temperature</p>
+            <h5 id="temperature" class="font-weight-bolder">
+              {{ temperature }} °C
+            </h5>
+            <p class="mb-0">
+              <span id="raindrop" class="text-success text-sm font-weight-bolder">{{ raindrop }} ml</span> of raindrop
+            </p>
+          </div>
+        </div>
+        <div class="col-4 text-end">
+          <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
+            <i class="ni ni-umbrella-13 text-lg opacity-10" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<div class="col-lg-7 mb-lg-0 mb-4">
+  <div class="card z-index-2 h-100">
+    <div class="card-header pb-0 pt-3 bg-transparent">
+      <h6 class="text-capitalize">Sensor Data</h6>
+      <!-- <p class="text-sm mb-0">
+        <i class="fa fa-arrow-up text-success"></i>
+        <span class="font-weight-bold">4% more</span> in 2021
+      </p> -->
+    </div>
+    <div class="card-body p-3">
+      <div>
+        <select class="dropdown-toggle" id="dataRangeSelect">
+          <option value="all">All</option>
+          <option value="10">10 Entry</option>
+          <option value="20">20 Entry</option>
+          <option value="50">50 Entry</option>
+          <option value="100">100 Entry</option>
+      </select>
+        
+        <button class="btn btn-primary" id="updateDataButton">Update Data</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="sensoraDataChart"></canvas>
+      </div>
+      
+    <audio id="alertSound" src="{{ url_for('static', filename='sounds/alert.mp3') }}" preload="auto"></audio>
+    <audio id="predictionAlertSound" src="{{ url_for('static', filename='sounds/prediction_alert.mp3') }}" preload="auto"></audio>
+    
+    </div>
+    
+    <script>
+      
+      let previousStatus = '';
+      let previousPredictedStatus = '';
+    
+      function showAlert() {
+        alert("Danger! The water level status is now 'DANGER'!");
+      }
+    
+      function playSound() {
+          const sound = document.getElementById('alertSound');
+          sound.play();
+      }
+
+      function playPredictedSound() {
+            const prediction_sound = document.getElementById('predictionAlertSound');
+            prediction_sound.play();
+        }
+    
+      function sendNotification() {
+          if (Notification.permission === "granted") {
+              new Notification("Danger Alert!", {
+                  body: "The water level status is now 'DANGER'!",
+                  icon: "{{ url_for('static', filename='images/alert-icon.png') }}"
+              });
+          } else if (Notification.permission !== "denied") {
+              Notification.requestPermission().then(permission => {
+                  if (permission === "granted") {
+                      new Notification("Danger Alert!", {
+                          body: "The water level status is now 'DANGER'!",
+                          icon: "{{ url_for('static', filename='images/alert-icon.png') }}"
+                      });
+                  }
+              });
+          }
+      }
+    
+    
+      function updateRealTimeData() {
+          $.ajax({
+              url: '/api/real-time',
+              method: 'GET',
+              success: function(data) {
+    
+                  let statusClass = 'text';
+                  if (data.status_sensor_a.toLowerCase() === 'SAFE') {
+                      statusClass += 'text-success';
+                  } else if (data.status_sensor_a.toLowerCase() === 'WARNING') {
+                      statusClass += 'text-warning';
+                  } else {
+                      statusClass += 'text-danger';
+                  }
+    
+                  let predicted_statusClass = 'text';
+                  if (data.predicted_status_sensor_a.toLowerCase() === 'SAFE') {
+                      predicted_statusClass += 'text-success';
+                  } else if (data.predicted_status_sensor_a.toLowerCase() === 'WARNING') {
+                      predicted_statusClass += 'text-warning';
+                  } else {
+                      predicted_statusClass += 'text-danger';
+                  }
+    
+                  $('#latest_water_level_sensor_a').text(data.latest_water_level_sensor_a + ' m');
+                  $('#status_sensor_a').text(data.status_sensor_a).attr('class', statusClass + 'text-sm font-weight-bolder');
+                  $('#latest_predicted_water_level_sensor_a').text(data.latest_predicted_water_level_sensor_a + ' m');
+                  $('#predicted_status_sensor_a').text(data.predicted_status_sensor_a).attr('class', predicted_statusClass + 'text-sm font-weight-bolder');
+                  $('#temperature').text(data.temperature + ' °C');
+                  $('#raindrop').text(data.raindrop + ' ml');
+                  $('#time').text(data.time);
+                  $('#date').text(data.date);
+    
+                  if (data.status.toLowerCase() === 'danger' && previousStatus !== 'danger') {
+                    playSound();
+                    sendNotification();
+                        showAlert();
+                    } else if (data.predicted_status.toLowerCase() === 'danger' && previousPredictedStatus !== 'danger') {
+                        playPredictedSound();
+                      }
+    
+                  previousStatus = data.status.toLowerCase();
+    
+              }
+          });
+      }
+      
+      function drawLimiters(chart, limiters) {
+          const ctx = chart.ctx;
+          const yAxis = chart.scales.y;
+          
+          limiters.forEach(limiter => {
+              const y = yAxis.getPixelForValue(limiter.value);
+              
+              ctx.save();
+              ctx.beginPath();
+              ctx.moveTo(chart.chartArea.left, y);
+              ctx.lineTo(chart.chartArea.right, y);
+              ctx.strokeStyle = limiter.color;
+              ctx.lineWidth = 2;
+              ctx.stroke();
+              ctx.fillStyle = limiter.color;
+              ctx.fillText(limiter.name, chart.chartArea.right - 50, y - 5);
+              ctx.restore();
+          });
+      }
+    
+      // function updateSensoraData() {
+      //     $.ajax({
+      //         url: '/api/sensor-a-data',
+      //         method: 'GET',
+      //         success: function(data) {
+      //             sensoraDataChart.data.labels = data.labels_prediction;
+      //             sensoraDataChart.data.datasets[0].data = data.values;
+      //             sensoraDataChart.data.datasets[1].data = data.values_prediction;  // Update prediction data
+    
+      //             // Store limiters in chart options
+      //             sensoraDataChart.options.limiters = data.limiters;
+    
+      //             sensoraDataChart.update();
+    
+      //             var tbody = $('#sensoraDataTable tbody');
+      //             tbody.empty();
+      //             for (var i = 0; i < data.labels.length; i++) {
+      //                 tbody.append('<tr><td>' + data.labels_prediction[i] + '</td><td>' + data.values[i-1] + '</td><td>' + data.values_prediction[i] + '</td></tr>');
+      //             }
+      //         }
+      //     });
+      // }
+    
+      $(document).ready(function() {
+          setInterval(updateRealTimeData, 5000);
+
+          $('#updateDataButton').click(function() {
+        updateSensoraData();
+    });
+
+    function updateSensoraData() {
+        $.ajax({
+            url: '/api/sensor-a-data',
+            method: 'GET',
+            success: function(data) {
+                var selectedRange = $('#dataRangeSelect').val();
+                var filteredData = filterDataByRange(data, selectedRange);
+
+                sensoraDataChart.data.labels = filteredData.labels;
+                sensoraDataChart.data.datasets[0].data = filteredData.values;
+                sensoraDataChart.data.datasets[1].data = filteredData.values_prediction;
+
+                // Store limiters in chart options
+                sensoraDataChart.options.limiters = filteredData.limiters;
+
+                sensoraDataChart.update();
+
+                var tbody = $('#sensoraDataTable tbody');
+                tbody.empty();
+                for (var i = 0; i < filteredData.labels.length; i++) {
+                    tbody.append('<tr><td>' + filteredData.labels[i] + '</td><td>' + filteredData.values[i] + '</td><td>' + filteredData.values_prediction[i] + '</td></tr>');
+                }
+            }
+        });
+    }
+
+    function filterDataByRange(data, range) {
+        var end = data.labels.length;
+        var start = 0;
+
+        if (range !== 'all') {
+            var rangeValue = parseInt(range);
+            start = Math.max(end - rangeValue, 0);
+        }
+
+        return {
+            labels: data.labels.slice(start, end),
+            values: data.values.slice(start, end),
+            values_prediction: data.values_prediction.slice(start, end),
+            limiters: data.limiters
+        };
+    }
+    
+          const ctx = document.getElementById('sensoraDataChart').getContext('2d');
+          window.sensoraDataChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: {{ labels_prediction|safe }},
+                  datasets: [
+                      {
+                          label: 'Actual Data',
+                          data: {{ values|safe }},
+                          borderColor: 'rgba(75, 192, 192, 1)',
+                          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                          borderWidth: 1,
+                          fill: true
+                      },
+                      {
+                          label: 'Prediction Data',
+                          data: {{ values_prediction|safe }},
+                          borderColor: 'rgba(255, 99, 132, 1)',
+                          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                          borderWidth: 1,
+                          fill: true,
+                          borderDash: [5, 5]
+                      }
+                  ]
+              },
+              options: {
+                  scales: {
+                      x: {
+                          type: 'time',
+                          time: {
+                              unit: 'hour'
+                          }
+                      },
+                      y: {
+                          beginAtZero: true
+                      }
+                  },
+                  plugins: {
+                      annotation: {
+                          annotations: []
+                      }
+                  }
+              },
+              plugins: [{
+                  afterDraw: function(chart) {
+                      if (chart.options.limiters) {
+                          drawLimiters(chart, chart.options.limiters);
+                      }
+                  }
+              }]
+          });
+    
+          setInterval(updateSensoraData, 5000);  // Update every 5 seconds
+      });
+    </script>
+  </div>
+</div>
+{% endblock %}
+
+{% block content_image %}
+
+<div class="col-lg-5 mb-lg-0 mb-4">
+  <div class="card z-index-2 h-100">
+    <div class="card-header pb-0 pt-3 bg-transparent">
+      <h6 class="text-capitalize">Active River</h6>
+    </div>
+    <div class="card-body p-3">
+      <div class="chart-container">
+        <img id="real-time-image" src="{{ url_for('plot_sensor_a_png') }}" alt="Chart Image" class="responsive-img">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateImage() {
+    const img = document.getElementById('real-time-image');
+    const timestamp = new Date().getTime(); // Generate a unique timestamp
+    img.src = "{{ url_for('plot_sensor_a_png') }}" + "?t=" + timestamp; // Append timestamp to URL to prevent caching
+  }
+
+  setInterval(updateImage, 5000); // Update image every 5 seconds (5000 milliseconds)
+</script>
+
+{% endblock %}
+
+{% block content_data %}
+
+<div class="table-wrapper">
+  <table class="table table-bordered" id="sensoraDataTable">
+      <thead>
+          <tr>
+              <th>Time</th>
+              <th>Actual </th>
+              <th>Prediction</th>
+              
+              <!-- Add other relevant headers -->
+          </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+  </table>
+  <div class="d-flex justify-content-center">
+      {{ pagination.links }}
+  </div>
+</div>
+
+{% endblock %}
+
