@@ -1,0 +1,40 @@
+# Core Flask dependencies
+Flask
+Flask-SQLAlchemy
+Flask-Caching
+Flask-CORS
+Flask-Paginate
+
+# Database dependencies
+SQLAlchemy
+PyMySQL
+mysql-connector-python
+
+# Data processing and analysis
+pandas
+numpy
+matplotlib
+scikit-learn
+tensorflow
+seaborn
+statsmodels
+
+# Configuration and environment
+python-dotenv
+
+# Utilities
+requests
+python-dateutil
+
+# Development and testing (optional)
+pytest
+pytest-flask
+black
+flake8
+
+# Production dependencies (optional)
+gunicorn
+redis
+
+# Monitoring and logging
+structlog

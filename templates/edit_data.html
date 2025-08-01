@@ -1,0 +1,198 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Data Table Update</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+{% extends "base.html" %}
+
+{% block content_breadcrumb %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+    <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
+    <li class="breadcrumb-item text-sm text-white active" aria-current="page">Edit Data</li>
+  </ol>
+  <h6 class="font-weight-bolder text-white mb-0">Edit Data</h6>
+</nav>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="col-lg-12 mb-lg-0 mb-4">
+    <div class="card z-index-2 h-100">
+        <div class="card-header pb-0 pt-3 bg-transparent">
+            <h6 class="text-capitalize">Active River</h6>
+        <!-- <p class="text-sm mb-0">
+            <i class="fa fa-arrow-up text-success"></i>
+          <span class="font-weight-bold">4% more</span> in 2021
+        </p> -->
+      </div>
+      <div class="card-body p-auto">
+          <div class="table-responsive">
+            <table class="table align-items-center">
+                <tbody>
+                    {% for row in river_data %}
+                    <form action="/update_river_data/{{ row.id }}" method="post">
+                        <tr>
+                            <td>
+                                <div class="text-center">
+                                    <p class="text-xs font-weight-bold mb-0">River Code:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_code" value="{{ row.river_code }}" placeholder="River Code"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">River Name:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_name" value="{{ row.river_name }}" placeholder="River Name"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">River Depth:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_depth" value="{{ row.river_depth }}" placeholder="River Depth"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Point Distance:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_point_distance" value="{{ row.river_point_distance }}" placeholder="Point Distance"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Flow Velocity:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_flow_velocity" value="{{ row.river_flow_velocity }}" placeholder="Flow Velocity"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Roughness:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_roughness" value="{{ row.river_roughness }}" placeholder="Roughness"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Width:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_width" value="{{ row.river_width }}" placeholder="Width"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Slope:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_slope" value="{{ row.river_slope }}" placeholder="Slope"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Safe Height:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_safe_height" value="{{ row.river_safe_height }}" placeholder="Safe Height"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Warning Height:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_warning_height" value="{{ row.river_warning_height }}" placeholder="Warning Height"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Danger Height:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="river_danger_height" value="{{ row.river_danger_height }}" placeholder="Danger Height"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </td>
+                    </tr>
+                </form>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block content_image %}
+<!-- <div class="card card-carousel overflow-hidden h-100 p-0" aria-hidden="">
+    <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
+      <div class="carousel-inner border-radius-lg h-100">
+        <div class="carousel-item h-100 active" style="background-image: url('{{ url_for('plot_png') }}'); background-size: auto; background-repeat: no-repeat;">
+          <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+            <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+              <i class="ni ni-camera-compact text-dark opacity-10"></i>
+            </div>
+            <h5 class="text-blue mb-1">Water Elevation Chart</h5>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="false"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="false"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div> -->
+{% endblock %}
+
+{% block content_data %}
+
+    <div class="table-responsive">
+        <table class="table align-items-center">
+            <tbody>
+                {% for row in water_posts %}
+                <form action="/update_water_post/{{ row.id }}" method="post">
+                    <tr>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Post Code:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="post_code" value="{{ row.post_code }}" placeholder="Post Code"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Post Name:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="post_name" value="{{ row.post_name }}" placeholder="Post Name"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">River Code:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="post_river_code" value="{{ row.post_river_code }}" placeholder="River Code"></h6>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-center">
+                                <p class="text-xs font-weight-bold mb-0">Post Sensor Placement:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="post_sensor_placement" value="{{ row.post_sensor_placement }}" placeholder="Sensor Placement"></h6>
+                            </div>
+                        </td>
+                        <td class="align-middle text-sm">
+                            <div class="col text-center">
+                                <p class="text-xs font-weight-bold mb-0">Coordinates:</p>
+                                <h6 class="text-sm mb-0"><input type="text" name="post_longitude" value="{{ row.post_longitude }}" placeholder="Longitude">, <input type="text" name="post_latitude" value="{{ row.post_latitude }}" placeholder="Latitude"></h6>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </td>
+
+                    </tr>
+                
+                </form>                
+                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

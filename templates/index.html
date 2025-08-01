@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content_breadcrumb %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+    <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
+    <li class="breadcrumb-item text-sm text-white active" aria-current="page">Dashboard</li>
+  </ol>
+  <h6 class="font-weight-bolder text-white mb-0">Dashboard</h6>
+</nav>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="col-lg-7 mb-lg-0 mb-4">
+  <div class="card z-index-2 h-100">
+    <div class="card-header pb-0 pt-3 bg-transparent">
+      <h6 class="text-capitalize">Active River</h6>
+      <!-- <p class="text-sm mb-0">
+        <i class="fa fa-arrow-up text-success"></i>
+        <span class="font-weight-bold">4% more</span> in 2021
+      </p> -->
+    </div>
+    <div class="card-body p-3">
+      <div id="map"></div>
+      
+      <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+      <script>
+        var waterPostData = {{ water_post_data|safe }};
+        
+        var map = L.map('map').setView([-7.585044734826405, 112.1139513250275], 15);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        waterPostData.forEach(function(post) {
+          if (post[3] && post[4]) {
+            // Swap post[3] (latitude) with post[4] (longitude)
+            L.marker([post[4], post[3]]).addTo(map)
+            .bindPopup('<b>' + post[1] + '</b><br />Post Name: ' + post[2]);
+          }
+        });
+        </script>
+    
+  </div>
+</div>
+</div>
+{% endblock %}
+
+{% block content_image %}
+
+<div class="col-lg-5 mb-lg-0 mb-4">
+  <div class="card z-index-2 h-100">
+    <div class="card-header pb-0 pt-3 bg-transparent">
+      <h6 class="text-capitalize">Active River</h6>
+    </div>
+    <div class="card-body p-3">
+      <div class="chart-container">
+        <img id="real-time-image" src="{{ url_for('plot_png') }}" alt="Chart Image" class="responsive-img">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateImage() {
+    const img = document.getElementById('real-time-image');
+    const timestamp = new Date().getTime(); // Generate a unique timestamp
+    img.src = "{{ url_for('plot_png') }}" + "?t=" + timestamp; // Append timestamp to URL to prevent caching
+  }
+
+  setInterval(updateImage, 5000); // Update image every 5 seconds (5000 milliseconds)
+</script>
+
+{% endblock %}
+
+{% block content_data %}
+
+<div class="table-responsive">
+    <table class="table align-items-center ">
+      <tbody>
+        {% for row in water_post_data_no_json %}
+        <tr>
+          <td>
+            <div class="text-center">
+              <p class="text-xs font-weight-bold mb-0">Post Code:</p>
+              <h6 class="text-sm mb-0">{{ row[1] }}</h6>
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <p class="text-xs font-weight-bold mb-0">Post Name:</p>
+              <h6 class="text-sm mb-0">{{ row[2] }}</h6>
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <p class="text-xs font-weight-bold mb-0">Post Sensor Placement:</p>
+              <h6 class="text-sm mb-0">{{ row[6] }}</h6>
+            </div>
+          </td>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">Coordinates:</p>
+              <h6 class="text-sm mb-0">{{ row[3] }}, {{ row[4] }}</h6>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="table-responsive">
+    <table class="table align-items-center ">
+      <tbody>
+        {% for row in river_data %}
+        <tr>
+          <td>
+            <div class="text-center">
+              <p class="text-xs font-weight-bold mb-0">River Code:</p>
+              <h6 class="text-sm mb-0">{{ row[1] }}</h6>
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <p class="text-xs font-weight-bold mb-0">River Name:</p>
+              <h6 class="text-sm mb-0">{{ row[11] }}</h6>
+            </div>
+          </td>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Depth:</p>
+              <h6 class="text-sm mb-0">{{ row[6] }}</h6>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Point Distance:</p>
+              <h6 class="text-sm mb-0">{{ row[2] }}</h6>
+            </div>
+          </td>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Water Flow:</p>
+              <h6 class="text-sm mb-0">{{ row[3] }}</h6>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Water Roughness:</p>
+              <h6 class="text-sm mb-0">{{ row[4] }}</h6>
+            </div>
+          </td>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Width:</p>
+              <h6 class="text-sm mb-0">{{ row[5] }}</h6>
+            </div>
+          </td>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Slope:</p>
+              <h6 class="text-sm mb-0">{{ row[7] }}</h6>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Safe Treshold:</p>
+              <h6 class="text-sm mb-0">{{ row[8] }}</h6>
+            </div>
+          </td>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Warning Treshold:</p>
+              <h6 class="text-sm mb-0">{{ row[9] }}</h6>
+            </div>
+          </td>
+          <td class="align-middle text-sm">
+            <div class="col text-center">
+              <p class="text-xs font-weight-bold mb-0">River Danger Treshold:</p>
+              <h6 class="text-sm mb-0">{{ row[10] }}</h6>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+
+{% endblock %}
